@@ -1,6 +1,6 @@
 ### Небольшой проект sneakers store
 
-Использовал React Router, React Context, react-slick, SASS / CSS Modules, Axios. (Дописать что делал в проекте*)
+Использовал React, React Router, React Context, react-slick, SASS / CSS Modules, Axios. (Дописать что делал в проекте*)
 
 <!-- реализованно загрузка активного трека, пауза\плей, переход на следующий\предыдущий треки, громкость, в работе пременил по возможности ES6+, адаптивность не сделал, использовал немного styled-components, изначально проект делал для учебы.
 [Посмотреть](https://spotify-clone-three-alpha.vercel.app/)

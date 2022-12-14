@@ -6,6 +6,7 @@ function Card({ title, imageUrl, price, onFavorite, onPlus }) {
 
   const onClickPlus = () => {
     setIsAdded(!isAdded);
+    onPlus({ title, imageUrl, price });
   };
 
   return (
@@ -23,8 +24,6 @@ function Card({ title, imageUrl, price, onFavorite, onPlus }) {
         <img
           className={styles.plus}
           onClick={onClickPlus}
-          // width={11}
-          // height={11}
           src={isAdded ? "/img/btn-checked.svg" : "/img/btn-plus.svg"}
         />
       </div>

@@ -8,8 +8,7 @@ function App() {
   const [items, setItems] = React.useState([]);
   const [cartItems, setCartItems] = React.useState([]);
   const [cartOpened, setCartOpened] = React.useState(false);
-
-  // fetch("https://6399497dfe03352a94eb04c2.mockapi.io/items");
+  const [searchValue, setSearchValue] = React.useState("");
 
   React.useEffect(() => {
     async function getUser() {
@@ -17,7 +16,11 @@ function App() {
         const response = await axios.get(
           "https://6399497dfe03352a94eb04c2.mockapi.io/items"
         );
+        const cart = await axios.get(
+          "https://6399497dfe03352a94eb04c2.mockapi.io/cart"
+        );
         setItems(response.data);
+        setCartItems(cart.data);
       } catch (error) {
         console.error(error);
       }
@@ -26,11 +29,28 @@ function App() {
   }, []);
 
   const onAddToCart = (obj) => {
-    // if (cartItems.find((i) => i !== obj) != alert("error")) return;
+    // if (cartItems.find((i) => i !== obj)) return;
     // if (cartItems.indexOf(obj !== cartItems(obj))) return;
     // if((arr.find(item => item.id == {нужный id}) && true) || false) return
+    // if (cartItems.includes(obj)) return 111;
+    // if (cartItems.indexOf(obj)) return console.log(11);
+    // if (cartItems.some((d) => d.name === obj)) {console.log(11);}
+    try {
+      axios.post("https://6399497dfe03352a94eb04c2.mockapi.io/cart", obj);
+    } catch (error) {
+      console.error(error);
+    }
     setCartItems((prev) => [...prev, obj]);
   };
+
+  const onChangeSearchValue = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+  };
+
+  // const onDeleteToCart = (obj) => {
+  //   setCartItems((prev) => [...])
+  // }
 
   return (
     <div className="wrapper clear">
@@ -40,22 +60,42 @@ function App() {
       <Header onClickCart={() => setCartOpened(true)} />
       <div className="content p-40">
         <div className="d-flex align-center justify-between mb-40">
-          <h1>Все кроссовки</h1>
+          <h1>
+            {searchValue
+              ? `Поиск по запросу: "${searchValue}"`
+              : "Все кроссовки"}
+          </h1>
           <div className="search-block d-flex">
             <img src="/img/search.svg" alt="Search" />
-            <input placeholder="Поиск..." />
+            <input
+              onChange={onChangeSearchValue}
+              value={searchValue}
+              placeholder="Поиск..."
+            />
+            {searchValue && (
+              <img
+                onClick={() => setSearchValue("")}
+                src="/img/btn-remove.svg"
+                alt="Search"
+              />
+            )}
           </div>
         </div>
 
         <div className="d-flex flex-wrap">
-          {items.map((item) => (
-            <Card
-              title={item.title}
-              price={item.price}
-              imageUrl={item.imageUrl}
-              onPlus={(obj) => onAddToCart(obj)}
-            />
-          ))}
+          {items
+            .filter((item) =>
+              item.title.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            .map((item, index) => (
+              <Card
+                key={index}
+                title={item.title}
+                price={item.price}
+                imageUrl={item.imageUrl}
+                onPlus={(obj) => onAddToCart(obj)}
+              />
+            ))}
         </div>
       </div>
     </div>

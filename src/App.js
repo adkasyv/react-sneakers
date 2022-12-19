@@ -35,6 +35,7 @@ function App() {
     // if (cartItems.includes(obj)) return 111;
     // if (cartItems.indexOf(obj)) return console.log(11);
     // if (cartItems.some((d) => d.name === obj)) {console.log(11);}
+
     try {
       axios.post("https://6399497dfe03352a94eb04c2.mockapi.io/cart", obj);
     } catch (error) {
@@ -48,14 +49,24 @@ function App() {
     console.log(event.target.value);
   };
 
-  // const onDeleteToCart = (obj) => {
-  //   setCartItems((prev) => [...])
-  // }
+  const onRemoveItem = (id) => {
+    // axios.delete(`https://60d381a361160900173c93d3.mockapi.io/cart/${id)`);
+    try {
+      axios.delete(`https://6399497dfe03352a94eb04c2.mockapi.io/cart/${id}`);
+      setCartItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="wrapper clear">
       {cartOpened && (
-        <Drawer items={cartItems} onClose={() => setCartOpened(false)} />
+        <Drawer
+          items={cartItems}
+          onClose={() => setCartOpened(false)}
+          onRemove={onRemoveItem}
+        />
       )}
       <Header onClickCart={() => setCartOpened(true)} />
       <div className="content p-40">

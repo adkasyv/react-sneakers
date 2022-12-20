@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from "./components/Card";
 import Header from "./components/Header";
 import Drawer from "./components/Drawer";
 
 function App() {
-  const [items, setItems] = React.useState([]);
-  const [cartItems, setCartItems] = React.useState([]);
-  const [cartOpened, setCartOpened] = React.useState(false);
-  const [searchValue, setSearchValue] = React.useState("");
+  const [items, setItems] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [cartOpened, setCartOpened] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [onFavorite, setOnFavorite] = useState(false); //all favorite
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function getUser() {
       try {
         const response = await axios.get(
@@ -105,6 +106,7 @@ function App() {
                 price={item.price}
                 imageUrl={item.imageUrl}
                 onPlus={(obj) => onAddToCart(obj)}
+                // onAddToFavorite={onAddToFavorite}
               />
             ))}
         </div>

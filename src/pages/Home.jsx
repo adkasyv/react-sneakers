@@ -30,7 +30,7 @@ function Home({
             placeholder="Поиск..."
           />
         </div>
-      </div> 
+      </div>
 
       <div className="d-flex flex-wrap">
         {items
@@ -38,8 +38,16 @@ function Home({
             item.title.toLowerCase().includes(searchValue.toLowerCase())
           )
           .map((item, index) => (
+            // <Card
+            //   key={index}
+            //   onFavorite={(obj) => onAddToFavorite(obj)}
+            //   onPlus={(obj) => onAddToCart(obj)}
+            //   {...item}
+
+            // />
             <Card
               key={index}
+              favorited={false}
               onFavorite={(obj) => onAddToFavorite(obj)}
               onPlus={(obj) => onAddToCart(obj)}
               {...item}

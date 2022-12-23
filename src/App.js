@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 import axios from "axios";
-// import Card from "./components/Card";
 import Header from "./components/Header";
 import Drawer from "./components/Drawer";
 import Home from "./pages/Home";
@@ -14,6 +13,8 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [cartOpened, setCartOpened] = useState(false);
+
+  // const testContext = createContext([]);
 
   useEffect(() => {
     async function getUser() {
@@ -39,7 +40,10 @@ function App() {
 
   const onAddToCart = async (obj) => {
     try {
-      if (cartItems.find((obj) => obj === obj)) {
+      if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
+        setCartItems((prev) =>
+          prev.filter((item) => Number(item.id) !== Number(obj.id))
+        );
         axios.delete(
           `"https://6399497dfe03352a94eb04c2.mockapi.io/cart/${obj.id}`
         );
@@ -68,7 +72,6 @@ function App() {
       console.error(error);
     }
   };
-
   const onAddToFavorite = async (obj) => {
     try {
       if (favorites.find((favObj) => favObj.id === obj.id)) {
@@ -116,7 +119,6 @@ function App() {
             />
           }
         ></Route>
-
         <Route
           path="/favorites"
           exact

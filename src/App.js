@@ -1,9 +1,9 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import axios from "axios";
 import Header from "./components/Header";
 import Drawer from "./components/Drawer";
 import Home from "./pages/Home";
-
+import AppContext from "./context";
 import { Route, Routes } from "react-router-dom";
 import Favorites from "./pages/Favorites";
 
@@ -13,50 +13,57 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [cartOpened, setCartOpened] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // const testContext = createContext([]);
+  // const color = "#000000";
+  // const [userColor, setUserColor] = useState({
+  //   color: "red",
+  // });
 
   useEffect(() => {
-    async function getUser() {
+    async function fetchData() {
       try {
-        const response = await axios.get(
-          "https://6399497dfe03352a94eb04c2.mockapi.io/items"
-        );
         const cart = await axios.get(
           "https://6399497dfe03352a94eb04c2.mockapi.io/cart"
         );
         const favorites = await axios.get(
           "https://6399497dfe03352a94eb04c2.mockapi.io/favorites"
         );
-        setItems(response.data);
+        const itemsResponse = await axios.get(
+          "https://6399497dfe03352a94eb04c2.mockapi.io/items"
+        );
+        setIsLoading(false);
         setCartItems(cart.data);
         setFavorites(favorites.data);
+        setItems(itemsResponse.data);
       } catch (error) {
         console.error(error);
       }
     }
-    getUser();
+    fetchData();
   }, []);
 
   const onAddToCart = async (obj) => {
+    console.log(obj.id);
     try {
       if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
+        await axios.delete(
+          `https://6399497dfe03352a94eb04c2.mockapi.io/cart/${obj.id}`
+        );
         setCartItems((prev) =>
           prev.filter((item) => Number(item.id) !== Number(obj.id))
         );
-        axios.delete(
-          `"https://6399497dfe03352a94eb04c2.mockapi.io/cart/${obj.id}`
-        );
         alert("Товар был удален из корзины");
       } else {
-        const { data } = await axios.post(
+        await axios.post(
           "https://6399497dfe03352a94eb04c2.mockapi.io/cart",
           obj
         );
-        setCartItems((prev) => [...prev, data]);
+        // setCartItems((prev) => [...prev, data]);
+        setCartItems((prev) => [...prev, obj]);
       }
     } catch (error) {
-      alert("Не удалось добавить в корзину");
+      alert("Товар уже был добавлен в корзину");
     }
   };
   const onChangeSearchInput = (event) => {
@@ -64,8 +71,8 @@ function App() {
     console.log(event.target.value);
   };
   const onRemoveItem = (id) => {
-    // axios.delete(`https://60d381a361160900173c93d3.mockapi.io/cart/${id)`);
     try {
+      console.log(id);
       axios.delete(`https://6399497dfe03352a94eb04c2.mockapi.io/cart/${id}`);
       setCartItems((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
@@ -91,46 +98,63 @@ function App() {
       alert("Не удалось добавить в фавориты");
     }
   };
+  // const isItemAdded = async (id) => {
+  //   return cartItems.some((obj) => Number(obj.id) === Number(id));
+  // };
+
+  const isItemAdded = (id) => {
+    return cartItems.some((obj) => Number(obj.id) === Number(id));
+  };
 
   return (
-    <div className="wrapper clear">
-      {cartOpened && (
-        <Drawer
-          items={cartItems}
-          onClose={() => setCartOpened(false)}
-          onRemove={onRemoveItem}
-        />
-      )}
-      <Header onClickCart={() => setCartOpened(true)} />
-      <Routes>
-        {/* <Route path="/test" exact element={<Header />}></Route> */}
-        <Route path="*">error</Route>
-        <Route
-          path="/"
-          exact
-          element={
-            <Home
-              items={items}
-              searchValue={searchValue}
-              setSearchValue={setSearchValue}
-              onChangeSearchInput={onChangeSearchInput}
-              onAddToFavorite={onAddToFavorite}
-              onAddToCart={onAddToCart}
-            />
-          }
-        ></Route>
-        <Route
-          path="/favorites"
-          exact
-          element={
-            <Favorites
-              favorites={favorites}
-              onAddToFavorite={onAddToFavorite}
-            />
-          }
-        ></Route>
-      </Routes>
-    </div>
+    <AppContext.Provider
+      value={{
+        items,
+        cartItems,
+        favorites,
+        isItemAdded,
+        onAddToFavorite,
+        setCartOpened,
+        setCartItems,
+      }}
+    >
+      <div className="wrapper clear">
+        {cartOpened && (
+          <Drawer
+            items={cartItems}
+            onClose={() => setCartOpened(false)}
+            onRemove={onRemoveItem}
+          />
+        )}
+        <Header onClickCart={() => setCartOpened(true)} />
+        <Routes>
+          {/* <Route path="/test" exact element={<Header />}></Route> */}
+          <Route path="*">error</Route>
+          <Route
+            path="/"
+            exact
+            element={
+              <Home
+                items={items}
+                isItemAdded={isItemAdded}
+                cartItems={cartItems}
+                searchValue={searchValue}
+                setSearchValue={setSearchValue}
+                onChangeSearchInput={onChangeSearchInput}
+                onAddToFavorite={onAddToFavorite}
+                onAddToCart={onAddToCart}
+                isLoading={isLoading}
+              />
+            }
+          ></Route>
+          <Route
+            path="/favorites"
+            exact
+            element={<Favorites onAddToFavorite={onAddToFavorite} />}
+          ></Route>
+        </Routes>
+      </div>
+    </AppContext.Provider>
   );
 }
 

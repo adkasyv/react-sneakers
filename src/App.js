@@ -1,11 +1,11 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
 import axios from "axios";
 import Header from "./components/Header";
 import Drawer from "./components/Drawer";
 import Home from "./pages/Home";
-import AppContext from "./context";
-import { Route, Routes } from "react-router-dom";
 import Favorites from "./pages/Favorites";
+import AppContext from "./context";
 
 function App() {
   const [items, setItems] = useState([]);
@@ -14,11 +14,6 @@ function App() {
   const [searchValue, setSearchValue] = useState("");
   const [cartOpened, setCartOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  // const color = "#000000";
-  // const [userColor, setUserColor] = useState({
-  //   color: "red",
-  // });
 
   useEffect(() => {
     async function fetchData() {
@@ -53,13 +48,11 @@ function App() {
         setCartItems((prev) =>
           prev.filter((item) => Number(item.id) !== Number(obj.id))
         );
-        alert("Товар был удален из корзины");
       } else {
         await axios.post(
           "https://6399497dfe03352a94eb04c2.mockapi.io/cart",
           obj
         );
-        // setCartItems((prev) => [...prev, data]);
         setCartItems((prev) => [...prev, obj]);
       }
     } catch (error) {
@@ -70,10 +63,12 @@ function App() {
     setSearchValue(event.target.value);
     console.log(event.target.value);
   };
-  const onRemoveItem = (id) => {
+  const onRemoveItem = async (id) => {
     try {
       console.log(id);
-      axios.delete(`https://6399497dfe03352a94eb04c2.mockapi.io/cart/${id}`);
+      await axios.delete(
+        `https://6399497dfe03352a94eb04c2.mockapi.io/cart/${id}`
+      );
       setCartItems((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error(error);
@@ -81,12 +76,13 @@ function App() {
   };
   const onAddToFavorite = async (obj) => {
     try {
-      if (favorites.find((favObj) => favObj.id === obj.id)) {
+      if (favorites.find((favObj) => Number(favObj.id) === Number(obj.id))) {
         axios.delete(
           `https://6399497dfe03352a94eb04c2.mockapi.io/favorites/${obj.id}`
         );
-        setFavorites((prev) => prev.filter((item) => item.id !== obj.id));
-        alert("Товар был удален из закладок");
+        setFavorites((prev) =>
+          prev.filter((item) => Number(item.id) !== Number(obj.id))
+        );
       } else {
         const { data } = await axios.post(
           "https://6399497dfe03352a94eb04c2.mockapi.io/favorites",
@@ -98,12 +94,11 @@ function App() {
       alert("Не удалось добавить в фавориты");
     }
   };
-  // const isItemAdded = async (id) => {
-  //   return cartItems.some((obj) => Number(obj.id) === Number(id));
-  // };
-
   const isItemAdded = (id) => {
     return cartItems.some((obj) => Number(obj.id) === Number(id));
+  };
+  const isItemAddedFavorite = (id) => {
+    return favorites.some((obj) => Number(obj.id) === Number(id));
   };
 
   return (
@@ -113,6 +108,7 @@ function App() {
         cartItems,
         favorites,
         isItemAdded,
+        isItemAddedFavorite,
         onAddToFavorite,
         setCartOpened,
         setCartItems,
@@ -128,16 +124,13 @@ function App() {
         )}
         <Header onClickCart={() => setCartOpened(true)} />
         <Routes>
-          {/* <Route path="/test" exact element={<Header />}></Route> */}
           <Route path="*">error</Route>
           <Route
             path="/"
             exact
             element={
               <Home
-                items={items}
-                isItemAdded={isItemAdded}
-                cartItems={cartItems}
+                // isItemAdded={isItemAdded}
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
                 onChangeSearchInput={onChangeSearchInput}
@@ -147,11 +140,7 @@ function App() {
               />
             }
           ></Route>
-          <Route
-            path="/favorites"
-            exact
-            element={<Favorites onAddToFavorite={onAddToFavorite} />}
-          ></Route>
+          <Route path="/favorites" exact element={<Favorites />}></Route>
         </Routes>
       </div>
     </AppContext.Provider>

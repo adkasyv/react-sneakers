@@ -24,13 +24,13 @@ function App() {
         const favorites = await axios.get(
           "https://6399497dfe03352a94eb04c2.mockapi.io/favorites"
         );
-        const itemsResponse = await axios.get(
+        const items = await axios.get(
           "https://6399497dfe03352a94eb04c2.mockapi.io/items"
         );
         setIsLoading(false);
         setCartItems(cart.data);
         setFavorites(favorites.data);
-        setItems(itemsResponse.data);
+        setItems(items.data);
       } catch (error) {
         console.error(error);
       }
@@ -38,37 +38,26 @@ function App() {
     fetchData();
   }, []);
 
-  const onAddToCart = async (obj) => {
-    console.log(obj.id);
+  const onAddToCart = (obj) => {
     try {
       if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
-        await axios.delete(
+        axios.delete(
           `https://6399497dfe03352a94eb04c2.mockapi.io/cart/${obj.id}`
         );
         setCartItems((prev) =>
           prev.filter((item) => Number(item.id) !== Number(obj.id))
         );
       } else {
-        await axios.post(
-          "https://6399497dfe03352a94eb04c2.mockapi.io/cart",
-          obj
-        );
+        axios.post("https://6399497dfe03352a94eb04c2.mockapi.io/cart", obj);
         setCartItems((prev) => [...prev, obj]);
       }
     } catch (error) {
       alert("Товар уже был добавлен в корзину");
     }
   };
-  const onChangeSearchInput = (event) => {
-    setSearchValue(event.target.value);
-    console.log(event.target.value);
-  };
   const onRemoveItem = async (id) => {
     try {
-      console.log(id);
-      await axios.delete(
-        `https://6399497dfe03352a94eb04c2.mockapi.io/cart/${id}`
-      );
+      axios.delete(`https://6399497dfe03352a94eb04c2.mockapi.io/cart/${id}`);
       setCartItems((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error(error);
@@ -94,12 +83,15 @@ function App() {
       alert("Не удалось добавить в фавориты");
     }
   };
+  const onChangeSearchInput = (event) => {
+    setSearchValue(event.target.value);
+  };
   const isItemAdded = (id) => {
     return cartItems.some((obj) => Number(obj.id) === Number(id));
   };
-  const isItemAddedFavorite = (id) => {
-    return favorites.some((obj) => Number(obj.id) === Number(id));
-  };
+  // const isItemAddedFavorite = (id) => {
+  //   return favorites.some((obj) => Number(obj.id) === Number(id));
+  // };
 
   return (
     <AppContext.Provider
@@ -108,7 +100,7 @@ function App() {
         cartItems,
         favorites,
         isItemAdded,
-        isItemAddedFavorite,
+        // isItemAddedFavorite,
         onAddToFavorite,
         setCartOpened,
         setCartItems,
@@ -130,7 +122,8 @@ function App() {
             exact
             element={
               <Home
-                // isItemAdded={isItemAdded}
+                items={items}
+                cartItems={cartItems}
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
                 onChangeSearchInput={onChangeSearchInput}

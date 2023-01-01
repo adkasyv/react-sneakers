@@ -35,16 +35,6 @@ header {
   }
 }
 
-.button {
-  background: #ffffff;
-  border: 1px solid #f2f2f2;
-  box-sizing: border-box;
-  border-radius: 8px;
-  height: 32px;
-  width: 32px;
-  cursor: pointer;
-}
-
 .cartEmpty {
   text-align: center;
 
@@ -77,7 +67,6 @@ header {
   border: 1px solid #f3f3f3;
   border-radius: 10px;
   padding: 0 15px;
-
   position: relative;
 
   .clear {
@@ -153,6 +142,10 @@ header {
   .greenButton {
     position: relative;
 
+    &:disabled {
+      animation: button-loading 0.6s ease-in-out infinite;
+    }
+
     &:hover {
       img {
         transform: translateX(5px);
@@ -179,6 +172,11 @@ header {
   font-weight: 500;
   cursor: pointer;
   transition: background 0.1s ease-in-out;
+
+  &:disabled {
+    background-color: #bebebe !important;
+    cursor: default;
+  }
 
   &:hover {
     background: lighten(#9dd558, 5%);
@@ -221,5 +219,17 @@ header {
     &:hover {
       opacity: 1;
     }
+  }
+}
+
+@keyframes button-loading {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
   }
 }

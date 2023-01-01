@@ -4,7 +4,6 @@ import AppContext from "../context";
 
 function Favorites() {
   const { favorites, onAddToFavorite } = useContext(AppContext);
-  console.log(favorites, onAddToFavorite);
   return (
     <div className="content p-40">
       <div className="d-flex align-center justify-between mb-40">
@@ -26,5 +25,3 @@ function Favorites() {
 }
 
 export default Favorites;
-
-// const { favorites, onAddToFavorite } = React.useContext(AppContext);

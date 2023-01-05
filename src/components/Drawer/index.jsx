@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Info from "./Info";
-import AppContext from "../context";
+import Info from "../Info";
+import { useCart } from "../../hooks/useCart";
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function Drawer({ onClose, onRemove, items = [] }) {
-  const { cartItems, setCartItems } = React.useContext(AppContext);
   const [orderId, setOrderId] = useState(null);
   const [isOrderComplete, setisOrderComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { cartItems, setCartItems, totalPrice } = useCart();
 
   const onClickOrder = async () => {
     try {
@@ -30,7 +30,8 @@ function Drawer({ onClose, onRemove, items = [] }) {
         await delay(1000);
       }
     } catch (error) {
-      alert("Ошибка при создании заказа :(");
+      // alert("Ошибка при создании заказа :(");
+      console.error("внешний блок catch", error.message);
     }
     setIsLoading(false);
   };
@@ -80,12 +81,12 @@ function Drawer({ onClose, onRemove, items = [] }) {
                 <li>
                   <span>Итого:</span>
                   <div></div>
-                  <b>21 498 руб. </b>
+                  <b>{totalPrice}</b>
                 </li>
                 <li>
                   <span>Налог 5%:</span>
                   <div></div>
-                  <b>1074 руб. </b>
+                  <b>{(totalPrice / 100) * 5} </b>
                 </li>
               </ul>
               <button

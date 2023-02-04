@@ -22,7 +22,7 @@ function Home({
         key={index}
         // favorited={false}
         onFavorite={(obj) => onAddToFavorite(obj)}
-        onPlusToCart={(obj) => onAddToCart(obj)}
+        onPlus={(obj) => onAddToCart(obj)}
         loading={isLoading}
         {...item}
       />

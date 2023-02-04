@@ -3,7 +3,8 @@ import Card from "../components/Card";
 import AppContext from "../context";
 
 function Favorites() {
-  const { favorites, onAddToFavorite } = useContext(AppContext);
+  const { favorites, onAddToFavorite, isItemAddedFavorite } =
+    useContext(AppContext);
   return (
     <div className="content p-40">
       <div className="d-flex align-center justify-between mb-40">
@@ -15,7 +16,7 @@ function Favorites() {
           <Card
             key={index}
             favorited={true}
-            onFavorite={onAddToFavorite}
+            isItemAddedFavorite={isItemAddedFavorite}
             {...item}
           />
         ))}

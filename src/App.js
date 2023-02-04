@@ -7,12 +7,14 @@ import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import AppContext from "./context";
 import Order from "./pages/Orders";
+import { Counter } from "./pages/Counter";
 
 function App() {
-  const [items, setItems] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [items, setItems] = useState([]); //items товаров
+  const [cartItems, setCartItems] = useState([]); //items корзины
+  const [favorites, setFavorites] = useState([]); //items favorites
+  const [searchValue, setSearchValue] = useState(""); //searh
+
   const [cartOpened, setCartOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -79,19 +81,34 @@ function App() {
   };
   const onAddToFavorite = async (obj) => {
     try {
-      if (favorites.find((favObj) => Number(favObj.id) === Number(obj.id))) {
-        axios.delete(
-          `https://6399497dfe03352a94eb04c2.mockapi.io/favorites/${obj.id}`
-        );
+      const findItem = favorites.find(
+        (item) => Number(item.parentId) === Number(obj.id)
+      );
+      console.log(obj);
+      if (findItem) {
         setFavorites((prev) =>
-          prev.filter((item) => Number(item.id) !== Number(obj.id))
+          prev.filter((item) => Number(item.parentId) !== Number(obj.id))
         );
+        await axios.delete(
+          `https://6399497dfe03352a94eb04c2.mockapi.io/favorites/${findItem.id}`
+        );
+        // setFavorites((prev) =>
+        //   prev.filter((item) => Number(item.id) !== Number(obj.id))
+        // );
       } else {
+        setFavorites((prev) => [...prev, obj]);
         const { data } = await axios.post(
           "https://6399497dfe03352a94eb04c2.mockapi.io/favorites",
           obj
         );
-        setFavorites((prev) => [...prev, data]);
+        setFavorites((prev) =>
+          prev.map((item) => {
+            if (item.parentId === data.parentId) {
+              return { ...item, id: data.id };
+            }
+            return item;
+          })
+        );
       }
     } catch (error) {
       alert("Не удалось добавить в фавориты");
@@ -103,9 +120,9 @@ function App() {
   const isItemAdded = (id) => {
     return cartItems.some((obj) => Number(obj.parentId) === Number(id));
   };
-  // const isItemAddedFavorite = (id) => {
-  //   return favorites.some((obj) => Number(obj.id) === Number(id));
-  // };
+  const isItemAddedFavorite = (id) => {
+    return favorites.some((obj) => Number(obj.parentId) === Number(id));
+  };
 
   return (
     <AppContext.Provider
@@ -113,9 +130,11 @@ function App() {
         items,
         cartItems,
         favorites,
+
         isItemAdded,
         onAddToCart,
-        // isItemAddedFavorite,
+
+        isItemAddedFavorite,
         onAddToFavorite,
         setCartOpened,
         setCartItems,
@@ -150,7 +169,7 @@ function App() {
           ></Route>
           <Route path="/favorites" exact element={<Favorites />}></Route>
           <Route path="/orders" exact element={<Order />}></Route>
-        </Routes>
+p        </Routes>
       </div>
     </AppContext.Provider>
   );

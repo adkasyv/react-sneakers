@@ -9,16 +9,17 @@ function Card({
   imageUrl,
   price,
   onFavorite,
-  onPlusToCart,
+  // onAddToFavorite,
+  onPlus,
   favorited = false,
   loading = false,
 }) {
   const [isFavorite, setIsFavorite] = useState(favorited);
-  const { isItemAdded } = useContext(AppContext);
+  const { isItemAdded, isItemAddedFavorite } = useContext(AppContext);
   const obj = { id, parentId: id, title, imageUrl, price };
 
   const onClickPlus = () => {
-    onPlusToCart(obj);
+    onPlus(obj);
   };
 
   const onClickFavorite = () => {
@@ -45,10 +46,15 @@ function Card({
         </ContentLoader>
       ) : (
         <>
-          <div className={styles.favorite} onClick={onClickFavorite}>
+          <div className={styles.favorite}>
             {onFavorite && (
               <img
-                src={isFavorite ? "/img/liked.svg" : "/img/unliked.svg"}
+                onClick={onClickFavorite}
+                src={
+                  isItemAddedFavorite(id)
+                    ? "/img/liked.svg"
+                    : "/img/unliked.svg"
+                }
                 alt="Unliked"
               />
             )}
@@ -60,7 +66,7 @@ function Card({
               <span>Цена:</span>
               <b>{price} руб.</b>
             </div>
-            {onPlusToCart && (
+            {onPlus && (
               <img
                 className={styles.plus}
                 onClick={onClickPlus}
